@@ -46,7 +46,7 @@ Watch how the Spectral GNN perfectly separates the academic papers into their 7 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/spectral-gnn.git
+   git clone https://github.com/governor08/spectral-gnn.git
    cd spectral-gnn
    ```
 2. Install dependencies:
