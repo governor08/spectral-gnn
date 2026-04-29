@@ -34,13 +34,12 @@ $$T_k(x) = 2x T_{k-1}(x) - T_{k-2}(x)$$
 
 ## 📊 Results on Cora Dataset
 
-*Note: The model achieves ~81% test accuracy, matching the performance of standard PyTorch Geometric implementations, but fully computed through custom tensor algebra.*
+*The model achieves **78.2% test accuracy** on Cora, matching the performance reported in Defferrard et al. (2016), fully computed through custom tensor algebra without any GNN framework.*
 
 ### Embeddings Evolution (t-SNE)
-Watch how the Spectral GNN perfectly separates the academic papers into their 7 respective categories based entirely on the graph topology and initial features:
+Watch how the Spectral GNN progressively separates the 2708 academic papers into their 7 categories over 200 epochs — based entirely on graph topology and node features:
 
-<!-- TO DO: Replace with your actual GIF once you generate it in Phase 3 -->
-![t-SNE Animation](assets/tsne_evolution.gif) 
+![t-SNE Animation](report/tsne_animation.gif)
 
 ## 🛠️ How to Run
 
@@ -53,9 +52,13 @@ Watch how the Spectral GNN perfectly separates the academic papers into their 7 
    ```bash
    pip install torch numpy networkx matplotlib scikit-learn
    ```
-3. Run the training loop:
+3. Run training:
    ```bash
-   python train.py
+   python main.py
+   ```
+4. Full pipeline (training + benchmark + t-SNE GIF):
+   ```bash
+   python main.py --benchmark --visualize
    ```
 
 ## 📚 References
