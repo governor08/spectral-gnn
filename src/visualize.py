@@ -1,8 +1,10 @@
 """
-Visualisation des embeddings intermédiaires via t-SNE animé.
-Prend les snapshots produits par train.py et génère un GIF frame par frame.
+t-SNE animation of node embeddings across training epochs.
 
-Auteur : S. Oussama
+Takes the embedding snapshots saved by the training loop and reduces them to 2D
+using t-SNE, one frame per snapshot. The resulting GIF shows how the model
+progressively separates Cora's 7 paper categories as it learns — a clean visual
+proof that graph structure alone is enough to distinguish research areas.
 """
 
 from __future__ import annotations
@@ -51,8 +53,8 @@ def _compute_tsne(
         n_components=2,
         perplexity=perplexity,
         random_state=random_state,
-        max_iter=300,       # rapide pour l'animation
-        init="pca",         # plus stable que l'init random
+        max_iter=300,       # kept short for animation speed
+        init="pca",         # PCA init is more stable than random for consistent frames
         learning_rate="auto",
     )
     coords = tsne.fit_transform(emb_np)
@@ -111,7 +113,7 @@ def generate_tsne_animation(
     for i, (epoch, embeddings) in enumerate(emb_hist):
         print(f"   Frame {i+1}/{len(emb_hist)} — époque {epoch} …")
 
-        # graine différente par frame pour éviter les minima locaux répétés
+        # different seed per frame avoids t-SNE converging to the same local minimum repeatedly
         coords = _compute_tsne(embeddings, perplexity=perplexity, random_state=i)
         fig = _render_frame(coords, labels_np, epoch, num_epochs_total)
 

@@ -1,8 +1,13 @@
 """
-Boucle d'entraînement pour ChebGNN sur Cora.
-Adam, NLLLoss, 200 époques, snapshots d'embeddings toutes les log_every époques.
+Training loop for ChebGNN on Cora.
 
-Auteur : S. Oussama
+Semi-supervised setup: loss is computed only on the 140 labeled nodes,
+but the Laplacian L̃ propagates information across all 2708 nodes at every
+forward pass — unlabeled nodes contribute to the learned representations
+even though they never appear in the loss.
+
+Optimizer: Adam with L2 weight decay. Loss: NLLLoss on log-softmax outputs.
+Embedding snapshots are saved every `log_every` epochs for the t-SNE animation.
 """
 
 from __future__ import annotations

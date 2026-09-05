@@ -1,6 +1,7 @@
 """
-src/__init__.py
-Exposition des modules principaux du package spectral-gnn.
+Public API for the spectral-gnn package.
+
+Import from here for clean, stable access to the core components.
 """
 
 from src.data_loader import load_cora, CoraData

@@ -1,8 +1,12 @@
 """
-Opérateurs spectraux sur graphes : adjacence, degrés, Laplacien normalisé, rescaling.
-Toutes les fonctions supportent sparse et dense.
+Graph spectral operators — built entirely from raw PyTorch tensors.
 
-Auteur : S. Oussama
+This module is the mathematical core of the project. It turns a bare list of edges
+into the rescaled Laplacian L̃ that ChebConv needs. Every function supports both
+sparse (COO) and dense tensors so the same pipeline works on small toy graphs
+and on Cora without changing a line.
+
+Pipeline: edges → A → D → L (normalized) → λ_max (power iteration) → L̃ (rescaled)
 """
 
 from __future__ import annotations
@@ -19,6 +23,7 @@ def build_adjacency(
     row, col = edges[0], edges[1]
 
     if add_self_loops:
+        # self-loops ensure every node aggregates its own features
         self_loop_idx = torch.arange(num_nodes, dtype=edges.dtype, device=edges.device)
         row = torch.cat([row, self_loop_idx], dim=0)
         col = torch.cat([col, self_loop_idx], dim=0)
@@ -38,9 +43,9 @@ def build_adjacency(
 
 
 def build_degree(A: torch.Tensor) -> torch.Tensor:
-    """d_i = sum_j A_{ij}"""
+    """Return the degree vector d_i = sum_j A_{ij} for each node."""
     if A.is_sparse:
-        # torch.sparse COO ne supporte pas sum(dim=1) directement
+        # sparse COO tensors don't support sum(dim=1) directly — scatter_add is the workaround
         A_coo = A.coalesce()
         row_indices = A_coo.indices()[0]
         values = A_coo.values()
@@ -57,11 +62,15 @@ def normalized_laplacian(
     D: torch.Tensor,
     dense: bool = True,
 ) -> torch.Tensor:
-    """L_norm = I - D^{-1/2} A D^{-1/2}"""
+    """Compute the normalized Laplacian L = I - D^{-1/2} A D^{-1/2}.
+
+    Normalization ensures eigenvalues stay in [0, 2] regardless of graph size,
+    making the Chebyshev rescaling well-conditioned.
+    """
     N = D.shape[0]
     device = D.device
 
-    # clamp pour éviter la division par zéro sur les noeuds isolés
+    # clamp to zero for isolated nodes — avoids division by zero without branching
     D_inv_sqrt = torch.where(D > 0, D.pow(-0.5), torch.zeros_like(D))
 
     if A.is_sparse:
@@ -109,7 +118,11 @@ def estimate_lambda_max(
     num_iter: int = 50,
     tol: float = 1e-6,
 ) -> float:
-    """Itération de puissance pour estimer la valeur propre dominante de L."""
+    """Estimate the largest eigenvalue of L via power iteration.
+
+    Full eigendecomposition costs O(N³). Power iteration converges to λ_max
+    in ~50 matrix-vector products — fast enough to run before every training run.
+    """
     N = L.shape[0]
     device = L.device if not L.is_sparse else L.coalesce().values().device
 
@@ -140,7 +153,11 @@ def rescale_laplacian(
     L: torch.Tensor,
     lambda_max: float,
 ) -> torch.Tensor:
-    """L_tilde = (2 / lambda_max) * L - I  =>  valeurs propres dans [-1, 1]"""
+    """Rescale L so its eigenvalues lie in [-1, 1]: L̃ = (2 / λ_max) * L - I.
+
+    Chebyshev polynomials are only stable on [-1, 1]. Without this rescaling,
+    the recursion T_k(L) would diverge for eigenvalues outside that range.
+    """
     N = L.shape[0]
     device = L.device if not L.is_sparse else L.coalesce().values().device
 

@@ -1,13 +1,11 @@
 """
-Point d'entrée du projet spectral-gnn.
+Entry point for spectral-gnn.
 
-Usage :
-    python main.py                         # entraînement seul
-    python main.py --benchmark             # + benchmark comparatif
-    python main.py --visualize             # + GIF t-SNE
-    python main.py --benchmark --visualize # tout
-
-Auteur : S. Oussama
+Usage:
+    python main.py                          # training only
+    python main.py --benchmark              # training + speed benchmark
+    python main.py --visualize              # training + t-SNE GIF
+    python main.py --benchmark --visualize  # full pipeline
 """
 
 from __future__ import annotations
@@ -70,7 +68,7 @@ def main() -> None:
     A = build_adjacency(data.edges, data.num_nodes, add_self_loops=True)
     D = build_degree(A)
 
-    # dense : N=2708 reste gérable (~58 Mo RAM)
+    # dense is fine at N=2708 (~58 MB) — switch to sparse=True for larger graphs
     L = normalized_laplacian(A, D, dense=True)
     lambda_max = estimate_lambda_max(L, num_iter=50)
     L_tilde = rescale_laplacian(L, lambda_max)

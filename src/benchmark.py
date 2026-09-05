@@ -1,8 +1,11 @@
 """
-Benchmark comparatif : StrictSpectralConv vs ChebConvFromScratch.
-Graphes Erdős-Rényi aléatoires, 3 forward passes par méthode (médiane).
+Speed benchmark: exact spectral convolution vs. Chebyshev approximation.
 
-Auteur : S. Oussama
+Runs both methods on random Erdős-Rényi graphs of increasing size and plots
+the forward-pass time on a log-log scale. The gap makes the O(N³) vs O(K·|E|)
+complexity difference viscerally clear — this is what motivates ChebNet.
+
+3 forward passes per method, median reported to reduce timing noise.
 """
 
 from __future__ import annotations
@@ -37,7 +40,7 @@ EDGE_PROB: float = 0.05
 
 
 def _random_edges(num_nodes: int, p: float) -> torch.Tensor:
-    # triangulaire sup pour éviter les doublons, puis symétrie
+    # upper triangle only to avoid duplicate edges, then symmetrize for undirected graph
     upper = torch.rand(num_nodes, num_nodes) < p
     upper = upper.triu(diagonal=1)
     adj_bool = upper | upper.T

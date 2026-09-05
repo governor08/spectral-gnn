@@ -1,8 +1,12 @@
 """
-Téléchargement et parsing du dataset Cora depuis l'URL officielle LINQS.
-Retourne les tenseurs PyTorch prêts pour l'entraînement.
+Cora dataset loader — downloads, parses, and returns ready-to-use PyTorch tensors.
 
-Auteur : S. Oussama
+Cora is a citation graph: 2708 papers as nodes, 5429 citations as edges, each paper
+described by a 1433-word bag-of-words vector and labeled with one of 7 research areas.
+
+Splits follow the Planetoid convention (Yang et al., 2016): 20 nodes per class for
+training (140 total), 500 for validation, 1000 for test. The dataset is downloaded
+automatically on first run and cached locally under `data/cora/`.
 """
 
 from __future__ import annotations
@@ -132,7 +136,7 @@ def _build_masks(
     num_nodes: int,
     labels: np.ndarray,
 ) -> Tuple[torch.BoolTensor, torch.BoolTensor, torch.BoolTensor]:
-    # stratégie Planetoid : 20 noeuds par classe pour train
+    # Planetoid split: 20 nodes per class → 140 labeled training nodes total
     train_indices = []
     per_class = NUM_TRAIN // len(LABEL_MAP)
 

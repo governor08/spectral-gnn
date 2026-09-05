@@ -1,8 +1,11 @@
 """
-ChebGNN : deux couches ChebConvFromScratch pour la classification de noeuds sur Cora.
-Architecture : ChebConv -> ReLU -> Dropout -> ChebConv -> LogSoftmax
+ChebGNN — two-layer spectral GNN for node classification.
 
-Auteur : S. Oussama
+Architecture: ChebConv → ReLU → Dropout → ChebConv → LogSoftmax
+
+The first layer learns a 64-dimensional embedding per node by aggregating features
+from K-hop neighborhoods. The second layer maps those embeddings to class logits.
+Dropout between layers is the main regularizer for the semi-supervised setting.
 """
 
 from __future__ import annotations
@@ -44,7 +47,7 @@ class ChebGNN(nn.Module):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         h = self.conv1(x, L_tilde)
         h = F.relu(h)
-        embeddings = h.detach()  # snapshot pour visualisation, sans graph autograd
+        embeddings = h.detach()  # snapshot for t-SNE — detached so it doesn't affect gradients
         h = self.dropout(h)
 
         out = self.conv2(h, L_tilde)
