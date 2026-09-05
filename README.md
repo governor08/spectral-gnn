@@ -5,7 +5,7 @@
 ![Math](https://img.shields.io/badge/Math-Linear_Algebra_%26_Spectral_Theory-8a2be2)
 ![Accuracy](https://img.shields.io/badge/Cora_Accuracy-78.2%25-brightgreen)
 
-A from-scratch implementation of a **Spectral Graph Neural Network** based on [Defferrard et al. (2016) — ChebNet](https://arxiv.org/abs/1606.09320), applied to semi-supervised node classification on the Cora citation graph.
+A from-scratch implementation of a **Spectral Graph Neural Network** based on [Defferrard et al. (2016) — ChebNet](https://arxiv.org/abs/1606.09375), applied to semi-supervised node classification on the Cora citation graph.
 
 Most people use PyTorch Geometric and call `.forward()`. This project goes one level deeper — every operator is built by hand: adjacency matrix, normalized Laplacian, power iteration for λ_max, and the full Chebyshev polynomial recursion. No GNN framework. Just matrix algebra and PyTorch tensors.
 
@@ -107,5 +107,5 @@ All figures are saved to `report/`.
 ---
 
 ## References
-- [Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering — Defferrard, Bresson, Vandergheynst (2016)](https://arxiv.org/abs/1606.09320)
+- [Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering — Defferrard, Bresson, Vandergheynst (2016)](https://arxiv.org/abs/1606.09375)
 - [Semi-Supervised Classification with Graph Convolutional Networks — Kipf & Welling (2017)](https://arxiv.org/abs/1609.02907)
